@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NV – Nusa Vibes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --sand:#F5EFE6;--cream:#FAF7F2;--tc:#C0622A;--tc2:#9E4E1F;
+      --bark:#3B2A1A;--olive:#7A8C5C;--gold:#C9A84C;--muted:#9C8874;
+      --white:#FFF;--card:#FFFDF9;--border:#E8DDD1;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--bark);overflow-x:hidden;cursor:none}
+
+    /* CURSOR */
+    #cur{width:13px;height:13px;background:var(--tc);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transition:transform .14s,background .2s;transform:translate(-50%,-50%)}
+    #cur.h{transform:translate(-50%,-50%) scale(2.6);background:var(--gold);opacity:.7}
+
+    /* MODAL SYSTEM */
+    .ov{position:fixed;inset:0;background:rgba(20,10,0,.55);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px)}
+    .ov.on{opacity:1;pointer-events:all}
+    .mbox{background:#fff;border-radius:24px;padding:44px 46px;width:100%;max-width:460px;position:relative;transform:translateY(32px);transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:0 28px 80px rgba(0,0,0,.18);max-height:92vh;overflow-y:auto}
+    .ov.on .mbox{transform:translateY(0)}
+    .mcl{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;cursor:none;color:var(--muted);line-height:1}
+    .mcl:hover{color:var(--bark)}
+    .mlogo{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+    .mbadge{width:36px;height:36px;background:var(--tc);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:#fff}
+    .mbrand{font-family:'Playfair Display',serif;font-size:17px;font-weight:900}
+    .mtitle{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;margin-bottom:5px}
+    .msub{font-size:13px;color:var(--muted);margin-bottom:26px;line-height:1.6}
+    .fg{margin-bottom:16px}
+    .fl{font-size:12px;font-weight:600;color:var(--bark);letter-spacing:.4px;margin-bottom:5px;display:block}
+    .fi{width:100%;background:var(--sand);border:1.5px solid var(--border);border-radius:10px;padding:12px 15px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--bark);outline:none;transition:border-color .2s;cursor:text}
+    .fi:focus{border-color:var(--tc)}
+    .fi.er{border-color:#e74c3c}
+    .fe{font-size:11px;color:#e74c3c;margin-top:4px;display:none}
+    .fe.on{display:block}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .bfull{width:100%;background:var(--tc);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;cursor:none;transition:background .2s,transform .15s;margin-top:4px}
+    .bfull:hover{background:var(--tc2);transform:translateY(-1px)}
+    .bfull.dark{background:var(--bark)}
+    .bfull.dark:hover{background:var(--tc)}
+    .mswitch{text-align:center;margin-top:18px;font-size:13px;color:var(--muted)}
+    .mswitch a{color:var(--tc);font-weight:600;text-decoration:none;cursor:none}
+    .mswitch a:hover{text-decoration:underline}
+    .divider{display:flex;align-items:center;gap:12px;margin:18px 0;font-size:12px;color:var(--muted)}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    .soc-row{display:flex;gap:10px}
+    .bsoc{flex:1;background:var(--sand);border:1.5px solid var(--border);border-radius:10px;padding:11px;font-size:13px;font-weight:500;cursor:none;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+    .bsoc:hover{background:var(--border)}
+
+    /* NAVBAR */
+    nav{position:fixed;top:0;width:100%;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:70px;background:rgba(250,247,242,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+    .nlogo{display:flex;align-items:center;gap:12px;text-decoration:none;cursor:none}
+    .lbadge{width:42px;height:42px;background:var(--tc);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;letter-spacing:-1px}
+    .ltxt{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--bark)}
+    .lsub{font-size:10px;font-weight:300;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
+    .nlinks{display:flex;gap:34px}
+    .nlinks a{text-decoration:none;color:var(--bark);font-size:14px;font-weight:500;position:relative;padding-bottom:4px;transition:color .2s;cursor:none}
+    .nlinks a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--tc);transition:width .3s}
+    .nlinks a:hover{color:var(--tc)}
+    .nlinks a:hover::after{width:100%}
+    .nright{display:flex;align-items:center;gap:14px}
+    .nic{background:none;border:none;cursor:none;color:var(--bark);font-size:20px;position:relative;transition:color .2s}
+    .nic:hover{color:var(--tc)}
+    .ccnt{position:absolute;top:-6px;right:-8px;background:var(--tc);color:#fff;width:17px;height:17px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .bnl{background:var(--bark);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:none;transition:background .2s,transform .15s}
+    .bnl:hover{background:var(--tc);transform:translateY(-1px)}
+    .umenu{display:flex;align-items:center;gap:10px}
+    .uav{width:36px;height:36px;border-radius:50%;background:var(--tc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff}
+    .uname{font-size:14px;font-weight:600;color:var(--bark)}
+    .blg{background:none;border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:none;transition:all .2s}
+    .blg:hover{border-color:var(--tc);color:var(--tc)}
+
+    /* SEARCH */
+    .sbar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--cream);padding:16px 48px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);transform:translateY(-100%);transition:transform .3s}
+    .sbar.on{transform:translateY(0)}
+    .sinp{flex:1;background:var(--sand);border:1.5px solid var(--border);border-radius:10px;padding:12px 18px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--bark);outline:none;transition:border-color .2s;cursor:text}
+    .sinp:focus{border-color:var(--tc)}
+    .scl{background:none;border:none;font-size:22px;cursor:none;color:var(--bark)}
+
+    /* HERO */
+    .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:70px;overflow:hidden}
+    .hleft{display:flex;flex-direction:column;justify-content:center;padding:80px 60px 80px 80px}
+    .htag{display:inline-flex;align-items:center;gap:8px;background:var(--sand);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:12px;font-weight:600;color:var(--tc);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px;width:fit-content;animation:fu .8s ease both}
+    .htag::before{content:'●';font-size:8px;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .htitle{font-family:'Playfair Display',serif;font-size:clamp(46px,5.5vw,78px);font-weight:900;line-height:1.05;color:var(--bark);animation:fu .9s .1s ease both}
+    .htitle span{color:var(--tc)}
+    .hdesc{margin-top:22px;font-size:16px;font-weight:300;color:var(--muted);line-height:1.7;max-width:430px;animation:fu 1s .2s ease both}
+    .hcta{display:flex;gap:14px;margin-top:42px;animation:fu 1s .3s ease both}
+    .bp{background:var(--tc);color:#fff;border:none;border-radius:12px;padding:15px 34px;font-size:15px;font-weight:600;cursor:none;transition:all .25s;box-shadow:0 8px 24px rgba(192,98,42,.3)}
+    .bp:hover{background:var(--tc2);transform:translateY(-3px);box-shadow:0 14px 30px rgba(192,98,42,.4)}
+    .bs{background:transparent;color:var(--bark);border:1.5px solid var(--border);border-radius:12px;padding:15px 30px;font-size:15px;font-weight:500;cursor:none;transition:all .25s}
+    .bs:hover{border-color:var(--bark);background:var(--sand)}
+    .hstats{display:flex;gap:36px;margin-top:54px;animation:fu 1s .4s ease both}
+    .stat{display:flex;flex-direction:column}
+    .snum{font-family:'Playfair Display',serif;font-size:30px;font-weight:900}
+    .slbl{font-size:12px;color:var(--muted);margin-top:2px}
+    .hright{background:var(--sand);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    .hright::before{content:'NV';font-family:'Playfair Display',serif;font-size:360px;font-weight:900;color:rgba(192,98,42,.055);position:absolute;line-height:1;user-select:none;pointer-events:none}
+    .hvis{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:38px;position:relative;z-index:1;animation:fu 1s .2s ease both}
+    .hcard{background:#fff;border-radius:20px;padding:22px;box-shadow:0 4px 22px rgba(59,42,26,.08);transition:transform .3s;cursor:none}
+    .hcard:hover{transform:translateY(-6px)}
+    .hcard:nth-child(1){margin-top:38px}
+    .hcard:nth-child(4){margin-top:-38px}
+    .pem{font-size:54px;display:block;margin-bottom:10px;text-align:center}
+    .pn{font-weight:600;font-size:14px;color:var(--bark)}
+    .pp{font-size:13px;color:var(--tc);font-weight:700;margin-top:3px}
+    .pbadge{display:inline-block;background:var(--tc);color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-bottom:7px}
+    @keyframes fu{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+    /* MARQUEE */
+    .mwrap{background:var(--tc);padding:13px 0;overflow:hidden}
+    .mq{display:flex;animation:mq 22s linear infinite;white-space:nowrap}
+    .mi{font-size:12px;font-weight:700;color:#fff;letter-spacing:3px;text-transform:uppercase;padding:0 38px;border-right:1px solid rgba(255,255,255,.3)}
+    @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+    /* SECTIONS */
+    section{padding:96px 80px}
+    .slbl2{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--tc);font-weight:700;margin-bottom:11px}
+    .stitle{font-family:'Playfair Display',serif;font-size:clamp(30px,3.5vw,50px);font-weight:900;color:var(--bark);line-height:1.1}
+    .stitle span{color:var(--tc)}
+    .shdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px}
+    .va{font-size:13px;font-weight:600;color:var(--tc);text-decoration:none;display:flex;align-items:center;gap:5px;transition:gap .2s;cursor:none}
+    .va:hover{gap:9px}
+
+    /* CATEGORIES */
+    .catbg{background:var(--sand)}
+    .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:800px;margin:auto}
+    .ccard{border-radius:24px;padding:46px 38px;display:flex;flex-direction:column;gap:11px;cursor:none;transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden}
+    .ccard::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%);pointer-events:none}
+    .ccard:hover{transform:translateY(-8px);box-shadow:0 22px 56px rgba(59,42,26,.15)}
+    .ccard.baju{background:linear-gradient(135deg,var(--tc),#E07A40)}
+    .ccard.sepatu{background:linear-gradient(135deg,var(--bark),#5A3F28)}
+    .cicon{font-size:62px}
+    .cname{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#fff}
+    .cdesc{font-size:14px;color:rgba(255,255,255,.75);font-weight:300}
+    .ccnt2{font-size:12px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase}
+    .carr{background:rgba(255,255,255,.18);color:#fff;padding:9px 14px;border-radius:100px;margin-top:14px;width:fit-content;font-size:13px;transition:background .2s}
+    .ccard:hover .carr{background:rgba(255,255,255,.32)}
+
+    /* PRODUCT CARDS */
+    .pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+    .pcard{background:var(--card);border-radius:20px;border:1px solid var(--border);overflow:hidden;transition:transform .3s,box-shadow .3s;cursor:none;position:relative}
+    .pcard:hover{transform:translateY(-8px);box-shadow:0 18px 48px rgba(59,42,26,.12)}
+    .pimg{height:230px;display:flex;align-items:center;justify-content:center;font-size:86px;position:relative;overflow:hidden}
+    .pimg.bb{background:linear-gradient(135deg,#FDF0E8,#F5E0CE)}
+    .pimg.sb{background:linear-gradient(135deg,#EDE8E3,#DDD4C7)}
+    .nvov{position:absolute;bottom:10px;right:14px;font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:rgba(192,98,42,.32);letter-spacing:-1px}
+    .wbtn{position:absolute;top:13px;right:13px;width:35px;height:35px;border-radius:50%;background:rgba(255,255,255,.85);border:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:none;transition:all .2s;opacity:0}
+    .pcard:hover .wbtn{opacity:1}
+    .wbtn:hover{background:#fff;transform:scale(1.15)}
+    .pinfo{padding:17px}
+    .ptags{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+    .tag{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 7px;border-radius:4px}
+    .tnv{background:#FDE8D8;color:var(--tc)}
+    .tnew{background:#E8F0DE;color:var(--olive)}
+    .tsl{background:var(--tc);color:#fff}
+    .tbs{background:var(--bark);color:#fff}
+    .pname{font-weight:600;font-size:15px;color:var(--bark);margin-bottom:3px}
+    .psub{font-size:12px;color:var(--muted);margin-bottom:11px}
+    .ppr{display:flex;align-items:center;gap:7px}
+    .pprice{font-weight:700;font-size:16px;color:var(--tc)}
+    .pold{font-size:13px;color:#bbb;text-decoration:line-through}
+    .prat{font-size:12px;color:var(--gold);margin-top:5px}
+    .prat span{color:var(--muted);margin-left:3px}
+    .cbtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:13px}
+    .bac{background:var(--bark);color:#fff;border:none;border-radius:9px;padding:10px 4px;font-size:12px;font-weight:600;cursor:none;transition:background .2s,transform .15s}
+    .bac:hover{background:var(--tc);transform:translateY(-1px)}
+    .bbn{background:var(--tc);color:#fff;border:none;border-radius:9px;padding:10px 4px;font-size:12px;font-weight:600;cursor:none;transition:background .2s,transform .15s}
+    .bbn:hover{background:var(--tc2);transform:translateY(-1px)}
+
+    /* BRAND */
+    .brnd{background:var(--bark);display:grid;grid-template-columns:1fr 1fr;padding:0}
+    .bl{padding:96px 78px;display:flex;flex-direction:column;justify-content:center}
+    .bl .slbl2{color:var(--gold)}
+    .bl .stitle{color:#fff}
+    .bdesc{color:rgba(255,255,255,.63);line-height:1.8;font-size:15px;margin-top:18px;max-width:410px}
+    .bvals{display:flex;flex-direction:column;gap:18px;margin-top:42px}
+    .bval{display:flex;gap:14px;align-items:flex-start}
+    .bvic{font-size:23px;flex-shrink:0}
+    .bvtitle{font-weight:600;color:#fff;font-size:15px}
+    .bvdesc{font-size:13px;color:rgba(255,255,255,.48);margin-top:2px}
+    .br{background:var(--tc);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;min-height:480px}
+    .br::before{content:'NV';font-family:'Playfair Display',serif;font-size:300px;font-weight:900;color:rgba(255,255,255,.07);position:absolute;pointer-events:none}
+    .bembl{width:175px;height:175px;background:rgba(255,255,255,.12);border:3px solid rgba(255,255,255,.28);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+    .bembli{font-family:'Playfair Display',serif;font-size:62px;font-weight:900;color:#fff;letter-spacing:-4px}
+
+    /* PROMO */
+    .promo{background:linear-gradient(135deg,var(--olive),#5A6E3A);border-radius:26px;padding:58px 60px;display:flex;justify-content:space-between;align-items:center;margin:0 80px}
+    .ptitle{font-family:'Playfair Display',serif;font-size:40px;font-weight:900;color:#fff;line-height:1.1}
+    .prsub{color:rgba(255,255,255,.7);font-size:15px;margin-top:11px}
+    .prcode{background:rgba(255,255,255,.15);border:1.5px dashed rgba(255,255,255,.38);border-radius:10px;padding:14px 26px;text-align:center;margin-top:22px}
+    .prctext{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#fff;letter-spacing:4px}
+    .prcsub{font-size:12px;color:rgba(255,255,255,.58);margin-top:3px}
+    .prright{font-size:150px;opacity:.2}
+
+    /* FLASH */
+    .fhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:38px}
+    .fltitle{font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:var(--bark)}
+    .cdown{display:flex;gap:7px;align-items:center;background:var(--bark);border-radius:10px;padding:8px 14px}
+    .cbox{display:flex;flex-direction:column;align-items:center}
+    .cnum{font-family:'Playfair Display',serif;font-size:21px;font-weight:900;color:#fff;line-height:1}
+    .clbl{font-size:9px;color:rgba(255,255,255,.48);text-transform:uppercase;letter-spacing:1px}
+    .csep{color:rgba(255,255,255,.38);font-size:17px;margin-top:-4px}
+
+    /* TESTI */
+    .tsec{background:var(--sand)}
+    .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+    .tcard{background:#fff;border-radius:20px;padding:30px;border:1px solid var(--border);transition:transform .3s}
+    .tcard:hover{transform:translateY(-5px)}
+    .tstar{color:var(--gold);font-size:15px;margin-bottom:14px}
+    .ttxt{font-size:14px;color:var(--muted);line-height:1.7;font-style:italic}
+    .tauth{display:flex;align-items:center;gap:11px;margin-top:22px}
+    .tav{width:42px;height:42px;border-radius:50%;background:var(--sand);display:flex;align-items:center;justify-content:center;font-size:19px;border:2px solid var(--border)}
+    .tname{font-weight:600;font-size:14px;color:var(--bark)}
+    .tloc{font-size:12px;color:var(--muted)}
+
+    /* FOOTER */
+    footer{background:var(--bark);padding:76px 80px 38px;color:rgba(255,255,255,.58)}
+    .ftop{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:56px;margin-bottom:56px}
+    .fdesc{font-size:13px;line-height:1.8;margin-top:15px;color:rgba(255,255,255,.48);max-width:250px}
+    .fsoc{display:flex;gap:11px;margin-top:22px}
+    .fsb{width:37px;height:37px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:15px;text-decoration:none;transition:background .2s;cursor:none}
+    .fsb:hover{background:var(--tc)}
+    .fcol h4{font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px}
+    .fcol a{display:block;font-size:13px;color:rgba(255,255,255,.48);text-decoration:none;margin-bottom:9px;transition:color .2s;cursor:none}
+    .fcol a:hover{color:var(--tc)}
+    .fbot{border-top:1px solid rgba(255,255,255,.08);padding-top:30px;display:flex;justify-content:space-between;align-items:center}
+    .fcopy{font-size:12px}
+    .fpay{display:flex;gap:9px}
+    .fpb{background:rgba(255,255,255,.07);border-radius:6px;padding:5px 11px;font-size:11px;font-weight:600;color:rgba(255,255,255,.38)}
+
+    /* CART DRAWER */
+    .cov{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:400;opacity:0;pointer-events:none;transition:opacity .3s}
+    .cov.on{opacity:1;pointer-events:all}
+    .cdr{position:fixed;top:0;right:0;bottom:0;width:415px;background:var(--cream);z-index:401;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+    .cdr.on{transform:translateX(0)}
+    .chd{display:flex;justify-content:space-between;align-items:center;padding:26px 26px 18px;border-bottom:1px solid var(--border)}
+    .chd h3{font-family:'Playfair Display',serif;font-size:21px;font-weight:900}
+    .ccl{background:none;border:none;font-size:22px;cursor:none;color:var(--bark)}
+    .citems{flex:1;overflow-y:auto;padding:14px 26px}
+    .cemp{text-align:center;color:var(--muted);font-size:14px;margin-top:56px}
+    .ceit{display:flex;gap:13px;padding:14px 0;border-bottom:1px solid var(--border)}
+    .ceimg{width:66px;height:66px;border-radius:11px;background:var(--sand);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+    .ceinfo{flex:1}
+    .cename{font-weight:600;font-size:14px}
+    .cesz{font-size:12px;color:var(--muted);margin-top:2px}
+    .ceprice{font-weight:700;color:var(--tc);font-size:14px;margin-top:5px}
+    .ceqty{display:flex;align-items:center;gap:7px;margin-top:7px}
+    .qb{width:25px;height:25px;border-radius:6px;border:1.5px solid var(--border);background:none;font-size:15px;cursor:none;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .2s}
+    .qb:hover{border-color:var(--tc);color:var(--tc)}
+    .qn{font-size:14px;font-weight:600;min-width:22px;text-align:center}
+    .cerm{background:none;border:none;font-size:17px;color:#ccc;cursor:none;transition:color .2s;align-self:flex-start}
+    .cerm:hover{color:var(--tc)}
+    .cft{padding:15px 26px 26px;border-top:1px solid var(--border)}
+    .ctrow{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:5px}
+    .ctotal{display:flex;justify-content:space-between;font-weight:700;font-size:17px;margin-bottom:14px}
+    .chkbtn{width:100%;background:var(--tc);color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:600;cursor:none;transition:background .2s}
+    .chkbtn:hover{background:var(--tc2)}
+
+    /* CHECKOUT MODAL */
+    .cstep{display:none}
+    .cstep.on{display:block}
+    .stepind{display:flex;gap:7px;margin-bottom:26px;align-items:center}
+    .sdot{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--border);color:var(--muted);transition:all .3s;flex-shrink:0}
+    .sdot.done{background:var(--olive);color:#fff}
+    .sdot.act{background:var(--tc);color:#fff}
+    .sln{flex:1;height:2px;background:var(--border);border-radius:2px;transition:background .3s}
+    .sln.done{background:var(--olive)}
+    .osummary{background:var(--sand);border-radius:13px;padding:17px;margin-bottom:18px}
+    .oitem{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+    .oitem:last-child{border:none}
+    .ototal{display:flex;justify-content:space-between;font-weight:700;font-size:16px;margin-top:9px;padding-top:9px;border-top:2px solid var(--border)}
+    .payopts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+    .popt{background:var(--sand);border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;cursor:none;transition:all .2s;text-align:center;font-size:13px;font-weight:500}
+    .popt:hover,.popt.sel{border-color:var(--tc);background:#FDE8D8;color:var(--tc)}
+    .shopts{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+    .shopt{background:var(--sand);border:1.5px solid var(--border);border-radius:10px;padding:11px 15px;cursor:none;display:flex;justify-content:space-between;align-items:center;transition:all .2s}
+    .shopt:hover,.shopt.sel{border-color:var(--tc);background:#FDE8D8}
+    .shname{font-size:13px;font-weight:600}
+    .shtime{font-size:11px;color:var(--muted)}
+    .shprice{font-size:13px;font-weight:700;color:var(--tc)}
+    .bback{background:none;border:none;color:var(--muted);font-size:13px;cursor:none;margin-top:11px;display:block;text-align:center;width:100%}
+    .bback:hover{color:var(--bark)}
+    .succ{text-align:center;padding:8px 0}
+    .scircle{width:70px;height:70px;background:linear-gradient(135deg,var(--olive),#5A6E3A);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 18px}
+    .stit{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;margin-bottom:8px}
+    .ssub{font-size:13px;color:var(--muted);line-height:1.65}
+
+    /* BUY NOW */
+    .szopt{padding:8px 13px;border-radius:8px;border:1.5px solid var(--border);background:none;font-size:13px;font-weight:600;cursor:none;color:var(--bark);transition:all .2s}
+    .szopt.sel{border-color:var(--tc);background:#FDE8D8;color:var(--tc)}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:26px;right:26px;background:var(--bark);color:#fff;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:500;box-shadow:0 8px 28px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);z-index:9999;display:flex;align-items:center;gap:9px}
+    .toast.on{transform:translateY(0);opacity:1}
+
+    @media(max-width:1024px){
+      nav{padding:0 22px}.hero{grid-template-columns:1fr}.hright{min-height:380px}.hleft{padding:56px 36px}
+      section{padding:76px 36px}.pgrid{grid-template-columns:repeat(2,1fr)}.brnd{grid-template-columns:1fr}
+      .promo{margin:0 36px;flex-direction:column;text-align:center;gap:18px}.ftop{grid-template-columns:1fr 1fr}.tgrid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<div id="cur"></div>
+
+<!-- ===== LOGIN MODAL ===== -->
+<div class="ov" id="mLogin">
+  <div class="mbox">
+    <button class="mcl" onclick="closeM('mLogin')">✕</button>
+    <div class="mlogo"><div class="mbadge">NV</div><div class="mbrand">Nusa Vibes</div></div>
+    <h2 class="mtitle">Selamat Datang 👋</h2>
+    <p class="msub">Masuk ke akun NV kamu untuk mulai belanja!</p>
+    <div class="fg">
+      <label class="fl">Email</label>
+      <input class="fi" id="liEmail" type="email" placeholder="email@kamu.com"/>
+      <div class="fe" id="liEmailE">Format email tidak valid</div>
+    </div>
+    <div class="fg">
+      <label class="fl">Password</label>
+      <input class="fi" id="liPass" type="password" placeholder="Min. 6 karakter"/>
+      <div class="fe" id="liPassE">Password minimal 6 karakter</div>
+    </div>
+    <div style="text-align:right;margin-bottom:10px"><a href="#" style="font-size:12px;color:var(--tc);text-decoration:none;cursor:none">Lupa password?</a></div>
+    <button class="bfull" onclick="doLogin()">Masuk →</button>
+    <div class="divider">atau masuk dengan</div>
+    <div class="soc-row">
+      <button class="bsoc" onclick="socialLogin('Google')">🔵 Google</button>
+      <button class="bsoc" onclick="socialLogin('Facebook')">🔷 Facebook</button>
+    </div>
+    <div class="mswitch">Belum punya akun? <a onclick="switchM('mLogin','mReg')">Daftar sekarang</a></div>
+  </div>
+</div>
+
+<!-- ===== REGISTER MODAL ===== -->
+<div class="ov" id="mReg">
+  <div class="mbox">
+    <button class="mcl" onclick="closeM('mReg')">✕</button>
+    <div class="mlogo"><div class="mbadge">NV</div><div class="mbrand">Nusa Vibes</div></div>
+    <h2 class="mtitle">Buat Akun Baru ✨</h2>
+    <p class="msub">Bergabung & nikmati diskon member 25% untuk pembelian pertama!</p>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Nama Depan</label>
+        <input class="fi" id="rgFirst" type="text" placeholder="Budi"/>
+        <div class="fe" id="rgFirstE">Wajib diisi</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Nama Belakang</label>
+        <input class="fi" id="rgLast" type="text" placeholder="Santoso"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Email</label>
+      <input class="fi" id="rgEmail" type="email" placeholder="email@kamu.com"/>
+      <div class="fe" id="rgEmailE">Format email tidak valid</div>
+    </div>
+    <div class="fg">
+      <label class="fl">No. HP</label>
+      <input class="fi" id="rgPhone" type="tel" placeholder="08xxxxxxxxxx"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Password</label>
+      <input class="fi" id="rgPass" type="password" placeholder="Min. 6 karakter"/>
+      <div class="fe" id="rgPassE">Password minimal 6 karakter</div>
+    </div>
+    <button class="bfull" onclick="doRegister()">Daftar Sekarang →</button>
+    <div class="mswitch">Sudah punya akun? <a onclick="switchM('mReg','mLogin')">Masuk di sini</a></div>
+  </div>
+</div>
+
+<!-- ===== BUY NOW MODAL ===== -->
+<div class="ov" id="mBuy">
+  <div class="mbox" style="max-width:460px">
+    <button class="mcl" onclick="closeM('mBuy')">✕</button>
+    <div class="mlogo"><div class="mbadge">NV</div><div class="mbrand">Beli Sekarang</div></div>
+    <div id="bnProd" style="display:flex;gap:15px;align-items:center;background:var(--sand);border-radius:14px;padding:15px;margin-bottom:22px">
+      <div id="bnEm" style="font-size:46px;width:66px;height:66px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:11px;flex-shrink:0"></div>
+      <div><div id="bnNm" style="font-weight:700;font-size:15px"></div><div id="bnSb" style="font-size:12px;color:var(--muted);margin-top:2px"></div><div id="bnPr" style="font-weight:700;color:var(--tc);margin-top:6px;font-size:16px"></div></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Pilih Ukuran</label>
+      <div id="szOpts" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Jumlah</label>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:4px">
+        <button class="qb" style="width:34px;height:34px" onclick="chgQ(-1)">−</button>
+        <span id="bnQ" style="font-size:16px;font-weight:700;min-width:28px;text-align:center">1</span>
+        <button class="qb" style="width:34px;height:34px" onclick="chgQ(1)">+</button>
+        <span style="font-size:13px;color:var(--muted)">Stok tersedia</span>
+      </div>
+    </div>
+    <button class="bfull" style="margin-top:6px" onclick="confirmBuy()">Beli Sekarang →</button>
+    <button class="bfull dark" style="margin-top:9px" onclick="atcFromBuy()">+ Masukkan ke Keranjang</button>
+  </div>
+</div>
+
+<!-- ===== CHECKOUT MODAL ===== -->
+<div class="ov" id="mCO">
+  <div class="mbox" style="max-width:530px">
+    <button class="mcl" onclick="closeM('mCO')">✕</button>
+    <div class="mlogo"><div class="mbadge">NV</div><div class="mbrand">Checkout</div></div>
+    <!-- Steps -->
+    <div class="stepind">
+      <div class="sdot act" id="sd1">1</div><div class="sln" id="sl1"></div>
+      <div class="sdot" id="sd2">2</div><div class="sln" id="sl2"></div>
+      <div class="sdot" id="sd3">3</div><div class="sln" id="sl3"></div>
+      <div class="sdot" id="sd4">✓</div>
+    </div>
+    <!-- Step 1: Alamat -->
+    <div class="cstep on" id="cs1">
+      <h2 class="mtitle" style="margin-bottom:5px">📍 Alamat Pengiriman</h2>
+      <p class="msub">Kemana paket NV kamu dikirim?</p>
+      <div class="frow">
+        <div class="fg"><label class="fl">Nama Penerima</label><input class="fi" id="snName" placeholder="Nama lengkap"/><div class="fe" id="snNameE">Wajib diisi</div></div>
+        <div class="fg"><label class="fl">No. HP</label><input class="fi" id="snPhone" placeholder="08xx"/><div class="fe" id="snPhoneE">Wajib diisi</div></div>
+      </div>
+      <div class="fg"><label class="fl">Alamat Lengkap</label><input class="fi" id="snAddr" placeholder="Jl. Nusantara No. 17, RT 02/03"/><div class="fe" id="snAddrE">Wajib diisi</div></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Kota</label><input class="fi" id="snCity" placeholder="Jakarta Selatan"/></div>
+        <div class="fg"><label class="fl">Kode Pos</label><input class="fi" id="snZip" placeholder="12345"/></div>
+      </div>
+      <button class="bfull" onclick="goStep(2)">Pilih Pengiriman →</button>
+    </div>
+    <!-- Step 2: Pengiriman -->
+    <div class="cstep" id="cs2">
+      <h2 class="mtitle" style="margin-bottom:5px">🚚 Pilih Pengiriman</h2>
+      <p class="msub">Pilih layanan pengiriman favoritmu.</p>
+      <div class="shopts">
+        <div class="shopt sel" id="sh0" onclick="selShip(0,0,'JNE REG')"><div><div class="shname">JNE REG</div><div class="shtime">Estimasi 3–5 hari kerja</div></div><div class="shprice">Gratis</div></div>
+        <div class="shopt" id="sh1" onclick="selShip(1,15000,'JNE YES')"><div><div class="shname">JNE YES</div><div class="shtime">Estimasi 1–2 hari kerja</div></div><div class="shprice">Rp 15.000</div></div>
+        <div class="shopt" id="sh2" onclick="selShip(2,25000,'SiCepat BEST')"><div><div class="shname">SiCepat BEST</div><div class="shtime">Besok sampai (order sebelum 15.00)</div></div><div class="shprice">Rp 25.000</div></div>
+        <div class="shopt" id="sh3" onclick="selShip(3,5000,'GoSend Same Day')"><div><div class="shname">GoSend Same Day</div><div class="shtime">Hari ini sampai (Jabodetabek)</div></div><div class="shprice">Rp 5.000</div></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Kode Promo (Opsional)</label>
+        <div style="display:flex;gap:8px">
+          <input class="fi" id="promoIn" placeholder="Cth: NVNEW25" style="flex:1"/>
+          <button class="bnl" onclick="applyPromo()">Pakai</button>
+        </div>
+        <div id="promoMsg" style="font-size:12px;margin-top:5px;display:none"></div>
+      </div>
+      <button class="bfull" onclick="goStep(3)">Pilih Pembayaran →</button>
+      <button class="bback" onclick="goStep(1)">← Kembali</button>
+    </div>
+    <!-- Step 3: Pembayaran -->
+    <div class="cstep" id="cs3">
+      <h2 class="mtitle" style="margin-bottom:5px">💳 Metode Pembayaran</h2>
+      <p class="msub">Pilih cara bayar yang paling nyaman.</p>
+      <div class="payopts">
+        <div class="popt sel" id="po0" onclick="selPay(0,'Transfer BCA')">🏦 Transfer BCA</div>
+        <div class="popt" id="po1" onclick="selPay(1,'Transfer Mandiri')">🏦 Transfer Mandiri</div>
+        <div class="popt" id="po2" onclick="selPay(2,'OVO')">💜 OVO</div>
+        <div class="popt" id="po3" onclick="selPay(3,'GoPay')">💙 GoPay</div>
+        <div class="popt" id="po4" onclick="selPay(4,'DANA')">💛 DANA</div>
+        <div class="popt" id="po5" onclick="selPay(5,'COD')">📦 COD</div>
+      </div>
+      <div class="osummary">
+        <div id="oList"></div>
+        <div class="ototal"><span>Total Pembayaran</span><span id="gTotal" style="color:var(--tc)"></span></div>
+      </div>
+      <button class="bfull" onclick="placeOrder()">✅ Pesan Sekarang</button>
+      <button class="bback" onclick="goStep(2)">← Kembali</button>
+    </div>
+    <!-- Step 4: Sukses -->
+    <div class="cstep" id="cs4">
+      <div class="succ">
+        <div class="scircle">🎉</div>
+        <div class="stit">Pesanan Berhasil!</div>
+        <p class="ssub">Terima kasih telah berbelanja di <strong>NV – Nusa Vibes</strong>!<br>Nomor pesanan kamu: <strong id="ordNum" style="color:var(--tc)"></strong><br><br>Konfirmasi telah dikirim ke email kamu. Selamat menikmati koleksi NV! 🌿</p>
+        <button class="bfull" style="margin-top:26px" onclick="closeM('mCO');cart=[];updCart()">Kembali Belanja →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SEARCH BAR ===== -->
+<div class="sbar" id="sbar">
+  <input class="sinp" id="sinp" type="text" placeholder="Cari produk NV..." oninput="doSearch()"/>
+  <button class="scl" onclick="togSearch()">✕</button>
+</div>
+
+<!-- ===== NAVBAR ===== -->
+<nav>
+  <a href="#" class="nlogo">
+    <div class="lbadge">NV</div>
+    <div><div class="ltxt">Nusa Vibes</div><div class="lsub">Authentic Style</div></div>
+  </a>
+  <div class="nlinks">
+    <a href="#produk">Produk</a>
+    <a href="#kat">Kategori</a>
+    <a href="#flash">Flash Sale</a>
+    <a href="#brand">Brand</a>
+  </div>
+  <div class="nright">
+    <button class="nic" onclick="togSearch()" title="Cari">🔍</button>
+    <button class="nic" onclick="togCart()">🛒<span class="ccnt" id="ccnt">0</span></button>
+    <div id="navAuth">
+      <button class="bnl" onclick="openM('mLogin')">Masuk / Daftar</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hleft">
+    <div class="htag">✦ Koleksi Terbaru 2026</div>
+    <h1 class="htitle">Gaya <span>Nusantara</span><br>Dalam Setiap<br>Langkah</h1>
+    <p class="hdesc">Koleksi eksklusif NV – Nusa Vibes hadir membawa semangat alam dan budaya Indonesia dalam setiap helai kain dan tapak sepatu.</p>
+    <div class="hcta">
+      <button class="bp" onclick="document.getElementById('produk').scrollIntoView({behavior:'smooth'})">Belanja Sekarang →</button>
+      <button class="bs" onclick="document.getElementById('brand').scrollIntoView({behavior:'smooth'})">Tentang NV</button>
+    </div>
+    <div class="hstats">
+      <div class="stat"><span class="snum">12K+</span><span class="slbl">Pelanggan Puas</span></div>
+      <div class="stat"><span class="snum">240+</span><span class="slbl">Produk Koleksi</span></div>
+      <div class="stat"><span class="snum">4.9★</span><span class="slbl">Rating Toko</span></div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="hvis">
+      <div class="hcard"><span class="pem">👕</span><span class="pbadge">NV Logo Tee</span><div class="pn">Kaos Premium</div><div class="pp">Rp 249.000</div></div>
+      <div class="hcard"><span class="pem">👟</span><span class="pbadge">Bestseller</span><div class="pn">Sneaker NV</div><div class="pp">Rp 799.000</div></div>
+      <div class="hcard"><span class="pem">🧥</span><span class="pbadge">New Drop</span><div class="pn">Outer NV</div><div class="pp">Rp 449.000</div></div>
+      <div class="hcard"><span class="pem">👞</span><span class="pbadge">Limited</span><div class="pn">Loafer NV</div><div class="pp">Rp 649.000</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mwrap">
+  <div class="mq">
+    <span class="mi">✦ NV Nusa Vibes</span><span class="mi">Gratis Ongkir Se-Indonesia</span><span class="mi">✦ Koleksi Terbaru 2026</span><span class="mi">Baju & Sepatu Original NV</span><span class="mi">✦ Garansi Keaslian 100%</span><span class="mi">Return 14 Hari</span>
+    <span class="mi">✦ NV Nusa Vibes</span><span class="mi">Gratis Ongkir Se-Indonesia</span><span class="mi">✦ Koleksi Terbaru 2026</span><span class="mi">Baju & Sepatu Original NV</span><span class="mi">✦ Garansi Keaslian 100%</span><span class="mi">Return 14 Hari</span>
+  </div>
+</div>
+
+<!-- KATEGORI -->
+<section class="catbg" id="kat">
+  <div class="shdr"><div><div class="slbl2">Jelajahi</div><h2 class="stitle">Kategori <span>Produk</span></h2></div></div>
+  <div class="cgrid">
+    <div class="ccard baju" onclick="filterP('baju')"><div class="cicon">👕</div><div class="cname">Baju NV</div><div class="cdesc">Kaos, kemeja, outer & hoodie berlogo NV eksklusif</div><div class="ccnt2">120+ Produk</div><div class="carr">Lihat Koleksi →</div></div>
+    <div class="ccard sepatu" onclick="filterP('sepatu')"><div class="cicon">👟</div><div class="cname">Sepatu NV</div><div class="cdesc">Sneaker, loafer, boots & sandal dengan branding NV</div><div class="ccnt2">80+ Produk</div><div class="carr">Lihat Koleksi →</div></div>
+  </div>
+</section>
+
+<!-- FLASH SALE -->
+<section id="flash" style="background:var(--cream)">
+  <div class="fhdr">
+    <div style="display:flex;align-items:center;gap:11px"><span style="font-size:30px">🔥</span><span class="fltitle">Flash Sale</span></div>
+    <div class="cdown">
+      <div class="cbox"><div class="cnum" id="cdh">05</div><div class="clbl">Jam</div></div>
+      <div class="csep">:</div>
+      <div class="cbox"><div class="cnum" id="cdm">32</div><div class="clbl">Menit</div></div>
+      <div class="csep">:</div>
+      <div class="cbox"><div class="cnum" id="cds">00</div><div class="clbl">Detik</div></div>
+    </div>
+    <a href="#" class="va">Semua Flash Sale →</a>
+  </div>
+  <div class="pgrid" id="fgrid"></div>
+</section>
+
+<!-- PROMO BANNER -->
+<div class="promo">
+  <div>
+    <div class="slbl2" style="color:rgba(255,255,255,.7)">Penawaran Spesial</div>
+    <div class="ptitle">Diskon 25%<br>Member Baru</div>
+    <div class="prsub">Daftar sekarang dan nikmati diskon pertama kamu!</div>
+    <div class="prcode"><div class="prctext">NVNEW25</div><div class="prcsub">Kode Promo · Berlaku 3 hari</div></div>
+  </div>
+  <div class="prright">🎁</div>
+</div>
+
+<!-- PRODUK -->
+<section id="produk">
+  <div class="shdr">
+    <div><div class="slbl2">Koleksi NV</div><h2 class="stitle">Produk <span>Pilihan</span></h2></div>
+    <div style="display:flex;gap:9px">
+      <button class="bs" style="padding:8px 17px;font-size:13px;cursor:none" onclick="filterP('all')">Semua</button>
+      <button class="bs" style="padding:8px 17px;font-size:13px;cursor:none" onclick="filterP('baju')">Baju</button>
+      <button class="bs" style="padding:8px 17px;font-size:13px;cursor:none" onclick="filterP('sepatu')">Sepatu</button>
+    </div>
+  </div>
+  <div class="pgrid" id="mgrid"></div>
+</section>
+
+<!-- BRAND -->
+<div class="brnd" id="brand">
+  <div class="bl">
+    <div class="slbl2">Tentang Kami</div>
+    <h2 class="stitle" style="color:#fff">Jiwa <span style="color:var(--gold)">Nusantara</span><br>Dalam Setiap Produk</h2>
+    <p class="bdesc">NV – Nusa Vibes lahir dari kecintaan mendalam terhadap keindahan alam dan kekayaan budaya Indonesia. Setiap produk kami dirancang untuk merayakan identitas bangsa dengan gaya modern.</p>
+    <div class="bvals">
+      <div class="bval"><div class="bvic">🌿</div><div><div class="bvtitle">Ramah Lingkungan</div><div class="bvdesc">Bahan premium diproduksi secara berkelanjutan.</div></div></div>
+      <div class="bval"><div class="bvic">🏅</div><div><div class="bvtitle">Kualitas Premium</div><div class="bvdesc">Setiap jahitan dipilih dengan standar tertinggi.</div></div></div>
+      <div class="bval"><div class="bvic">🇮🇩</div><div><div class="bvtitle">Produk Lokal</div><div class="bvdesc">100% dibuat oleh pengrajin Indonesia terbaik.</div></div></div>
+    </div>
+  </div>
+  <div class="br"><div class="bembl"><div class="bembli">NV</div></div></div>
+</div>
+
+<!-- TESTIMONI -->
+<section class="tsec">
+  <div class="shdr"><div><div class="slbl2">Ulasan Pelanggan</div><h2 class="stitle">Mereka <span>Berkata</span></h2></div></div>
+  <div class="tgrid">
+    <div class="tcard"><div class="tstar">★★★★★</div><p class="ttxt">"Kaos NV beneran premium banget! Bahannya adem, logo NV-nya keren. Sudah beli 5 baju, semuanya memuaskan. Highly recommended!"</p><div class="tauth"><div class="tav">👩</div><div><div class="tname">Ayu Rahmawati</div><div class="tloc">Jakarta · Verified Buyer</div></div></div></div>
+    <div class="tcard"><div class="tstar">★★★★★</div><p class="ttxt">"Sneaker NV nyaman banget buat jalan seharian. Desainnya unik, ada logo NV-nya yang keren. Pengiriman juga super cepat!"</p><div class="tauth"><div class="tav">👨</div><div><div class="tname">Rizky Firmansyah</div><div class="tloc">Surabaya · Verified Buyer</div></div></div></div>
+    <div class="tcard"><div class="tstar">★★★★★</div><p class="ttxt">"Outer NV-nya cocok banget buat sehari-hari. Kualitas jahitannya rapi, bahan tebal tapi tidak gerah. Nusa Vibes gak bohong!"</p><div class="tauth"><div class="tav">👩</div><div><div class="tname">Dinda Kusuma</div><div class="tloc">Bandung · Verified Buyer</div></div></div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ftop">
+    <div>
+      <div style="display:flex;align-items:center;gap:11px"><div class="lbadge">NV</div><div><div class="ltxt" style="color:#fff">Nusa Vibes</div><div class="lsub">Authentic Style</div></div></div>
+      <p class="fdesc">Brand fashion lokal Indonesia dengan baju dan sepatu berlogo NV berkualitas premium dan gaya khas Nusantara.</p>
+      <div class="fsoc"><a class="fsb" href="#">📸</a><a class="fsb" href="#">🎵</a><a class="fsb" href="#">🐦</a><a class="fsb" href="#">▶️</a></div>
+    </div>
+    <div class="fcol"><h4>Produk</h4><a href="#">Baju NV</a><a href="#">Sepatu NV</a><a href="#">Koleksi Terbaru</a><a href="#">Flash Sale</a><a href="#">Best Seller</a></div>
+    <div class="fcol"><h4>Informasi</h4><a href="#">Tentang Kami</a><a href="#">Blog</a><a href="#">Karir</a><a href="#">Press Kit</a></div>
+    <div class="fcol"><h4>Bantuan</h4><a href="#">Pusat Bantuan</a><a href="#">Cara Pemesanan</a><a href="#">Lacak Pesanan</a><a href="#">Pengembalian</a><a href="#">Kontak Kami</a></div>
+  </div>
+  <div class="fbot">
+    <span class="fcopy">© 2026 NV – Nusa Vibes. Semua hak dilindungi undang-undang.</span>
+    <div class="fpay"><span class="fpb">BCA</span><span class="fpb">Mandiri</span><span class="fpb">OVO</span><span class="fpb">GoPay</span><span class="fpb">DANA</span><span class="fpb">COD</span></div>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cov" id="cov" onclick="togCart()"></div>
+<div class="cdr" id="cdr">
+  <div class="chd"><h3>Keranjang 🛒</h3><button class="ccl" onclick="togCart()">✕</button></div>
+  <div class="citems" id="citems"></div>
+  <div class="cft">
+    <div class="ctrow"><span>Subtotal</span><span id="cSub">Rp 0</span></div>
+    <div class="ctotal"><span>Total</span><span id="cTot">Rp 0</span></div>
+    <button class="chkbtn" onclick="openCheckout()">Lanjut Checkout →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="tmsg"></span></div>
+
+<script>
+// ── CURSOR ──
+const cur = document.getElementById('cur');
+document.addEventListener('mousemove', e => { cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
+function hov() {
+  document.querySelectorAll('a,button,.ccard,.pcard,.hcard,.popt,.shopt,.szopt,.bsoc,.fsb').forEach(el => {
+    el.addEventListener('mouseenter',()=>cur.classList.add('h'));
+    el.addEventListener('mouseleave',()=>cur.classList.remove('h'));
+  });
+}
+hov();
+
+// ── TOAST ──
+let tT;
+function toast(msg) {
+  const t=document.getElementById('toast'); document.getElementById('tmsg').textContent=msg;
+  t.classList.add('on'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('on'),3200);
+}
+
+// ── MODAL ──
+function openM(id){ document.getElementById(id).classList.add('on'); document.body.style.overflow='hidden'; }
+function closeM(id){ document.getElementById(id).classList.remove('on'); document.body.style.overflow=''; }
+function switchM(a,b){ closeM(a); setTimeout(()=>openM(b),200); }
+document.querySelectorAll('.ov').forEach(ov=>ov.addEventListener('click',e=>{ if(e.target===ov){ ov.classList.remove('on'); document.body.style.overflow=''; }}));
+
+// ── AUTH ──
+let user = null;
+function renderNav() {
+  const el = document.getElementById('navAuth');
+  if(user) {
+    el.innerHTML = `<div class="umenu"><div class="uav">${user.name[0].toUpperCase()}</div><span class="uname">${user.name}</span><button class="blg" onclick="doLogout()">Keluar</button></div>`;
+  } else {
+    el.innerHTML = `<button class="bnl" onclick="openM('mLogin')">Masuk / Daftar</button>`;
+  }
+  hov();
+}
+
+function doLogin() {
+  const em = document.getElementById('liEmail').value.trim();
+  const pw = document.getElementById('liPass').value;
+  let ok = true;
+  ['liEmail','liPass'].forEach(id=>{ document.getElementById(id).classList.remove('er'); });
+  ['liEmailE','liPassE'].forEach(id=>{ document.getElementById(id).classList.remove('on'); });
+  if(!em.match(/^[^@]+@[^@]+\.[^@]+$/)) { document.getElementById('liEmail').classList.add('er'); document.getElementById('liEmailE').classList.add('on'); ok=false; }
+  if(pw.length<6) { document.getElementById('liPass').classList.add('er'); document.getElementById('liPassE').classList.add('on'); ok=false; }
+  if(!ok) return;
+  const users = JSON.parse(localStorage.getItem('nv_users')||'[]');
+  const found = users.find(u=>u.email===em);
+  user = found || { name: em.split('@')[0], email: em };
+  localStorage.setItem('nv_sess', JSON.stringify(user));
+  closeM('mLogin'); renderNav(); toast(`✅ Selamat datang, ${user.name}!`);
+}
+
+function doRegister() {
+  const fn=document.getElementById('rgFirst').value.trim();
+  const ln=document.getElementById('rgLast').value.trim();
+  const em=document.getElementById('rgEmail').value.trim();
+  const pw=document.getElementById('rgPass').value;
+  let ok=true;
+  ['rgFirst','rgEmail','rgPass'].forEach(id=>document.getElementById(id).classList.remove('er'));
+  ['rgFirstE','rgEmailE','rgPassE'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  if(!fn){document.getElementById('rgFirst').classList.add('er');document.getElementById('rgFirstE').classList.add('on');ok=false;}
+  if(!em.match(/^[^@]+@[^@]+\.[^@]+$/)){document.getElementById('rgEmail').classList.add('er');document.getElementById('rgEmailE').classList.add('on');ok=false;}
+  if(pw.length<6){document.getElementById('rgPass').classList.add('er');document.getElementById('rgPassE').classList.add('on');ok=false;}
+  if(!ok) return;
+  const newU = { name: fn+(ln?' '+ln:''), email: em, phone: document.getElementById('rgPhone').value };
+  const users = JSON.parse(localStorage.getItem('nv_users')||'[]');
+  users.push(newU); localStorage.setItem('nv_users', JSON.stringify(users));
+  user = newU; localStorage.setItem('nv_sess', JSON.stringify(user));
+  closeM('mReg'); renderNav(); toast(`🎉 Akun berhasil dibuat! Selamat datang, ${user.name}!`);
+}
+
+function doLogout() { user=null; localStorage.removeItem('nv_sess'); renderNav(); toast('👋 Sampai jumpa!'); }
+function socialLogin(p) { user={name:'NV User',email:`user@${p.toLowerCase()}.com`}; localStorage.setItem('nv_sess',JSON.stringify(user)); closeM('mLogin'); renderNav(); toast(`✅ Masuk dengan ${p} berhasil!`); }
+
+// Restore session
+(()=>{ const s=localStorage.getItem('nv_sess'); if(s){try{user=JSON.parse(s);}catch(e){}} renderNav(); })();
+
+// ── PRODUCTS ──
+const prods = [
+  {id:1,name:'Kaos Logo NV Classic',sub:'Baju NV · Unisex',price:249000,old:349000,em:'👕',cat:'baju',bg:'bb',tags:['nv','sale'],rate:4.9,sold:2340,sz:['S','M','L','XL','XXL']},
+  {id:2,name:'Hoodie NV Oversized',sub:'Baju NV · Unisex',price:459000,old:null,em:'🧥',cat:'baju',bg:'bb',tags:['nv','best'],rate:5.0,sold:1820,sz:['S','M','L','XL']},
+  {id:3,name:'Sneaker NV Runner',sub:'Sepatu NV · All Size',price:799000,old:999000,em:'👟',cat:'sepatu',bg:'sb',tags:['nv','sale'],rate:4.8,sold:987,sz:['38','39','40','41','42','43','44']},
+  {id:4,name:'Kemeja NV Batik Fusion',sub:'Baju NV · Pria',price:389000,old:null,em:'👔',cat:'baju',bg:'bb',tags:['nv','new'],rate:4.7,sold:654,sz:['S','M','L','XL','XXL']},
+  {id:5,name:'Loafer NV Premium',sub:'Sepatu NV · Formal',price:649000,old:750000,em:'👞',cat:'sepatu',bg:'sb',tags:['nv','best'],rate:4.9,sold:432,sz:['38','39','40','41','42','43']},
+  {id:6,name:'Crop Top NV Logo',sub:'Baju NV · Wanita',price:219000,old:null,em:'👚',cat:'baju',bg:'bb',tags:['nv','new'],rate:4.8,sold:1100,sz:['XS','S','M','L']},
+  {id:7,name:'Boots NV Heritage',sub:'Sepatu NV · Unisex',price:899000,old:1100000,em:'🥾',cat:'sepatu',bg:'sb',tags:['nv','sale'],rate:4.6,sold:320,sz:['38','39','40','41','42','43','44']},
+  {id:8,name:'Polo Shirt NV Stripe',sub:'Baju NV · Pria',price:329000,old:null,em:'🎽',cat:'baju',bg:'bb',tags:['nv','best'],rate:4.7,sold:780,sz:['S','M','L','XL','XXL']},
+];
+const flashIds=[1,3,5,7];
+const fmt=n=>'Rp '+n.toLocaleString('id-ID');
+
+function mkCard(p) {
+  const disc = p.old?Math.round((1-p.price/p.old)*100):null;
+  const tHtml = p.tags.map(t=>{
+    if(t==='nv') return `<span class="tag tnv">NV Original</span>`;
+    if(t==='new') return `<span class="tag tnew">New</span>`;
+    if(t==='sale') return `<span class="tag tsl">-${disc}%</span>`;
+    if(t==='best') return `<span class="tag tbs">Best Seller</span>`;
+  }).join('');
+  const pd = JSON.stringify(p).replace(/'/g,"&#39;");
+  return `
+  <div class="pcard">
+    <div class="pimg ${p.bg}">${p.em}<div class="nvov">NV</div>
+      <button class="wbtn" onclick="toast('❤️ Ditambahkan ke wishlist!')">♡</button>
+    </div>
+    <div class="pinfo">
+      <div class="ptags">${tHtml}</div>
+      <div class="pname">${p.name}</div>
+      <div class="psub">${p.sub} · ${p.sold.toLocaleString('id-ID')} terjual</div>
+      <div class="ppr"><span class="pprice">${fmt(p.price)}</span>${p.old?`<span class="pold">${fmt(p.old)}</span>`:''}</div>
+      <div class="prat">★★★★★ <span>(${p.rate})</span></div>
+      <div class="cbtns">
+        <button class="bac" onclick='atc(${pd})'>+ Keranjang</button>
+        <button class="bbn" onclick='openBuy(${pd})'>Beli Sekarang</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderP(f='all') {
+  const list = f==='all'?prods:prods.filter(p=>p.cat===f);
+  document.getElementById('mgrid').innerHTML = list.length ? list.map(mkCard).join('') : `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)"><div style="font-size:48px;margin-bottom:14px">🔍</div><p>Tidak ada produk ditemukan</p></div>`;
+  animC(); hov();
+}
+function renderF() {
+  document.getElementById('fgrid').innerHTML = prods.filter(p=>flashIds.includes(p.id)).map(mkCard).join('');
+  animC(); hov();
+}
+function filterP(f) { renderP(f); if(f!=='all') document.getElementById('produk').scrollIntoView({behavior:'smooth'}); }
+renderP(); renderF();
+
+// ── SEARCH ──
+function togSearch(){ document.getElementById('sbar').classList.toggle('on'); if(document.getElementById('sbar').classList.contains('on')) setTimeout(()=>document.getElementById('sinp').focus(),300); }
+function doSearch() {
+  const q=document.getElementById('sinp').value.toLowerCase();
+  if(!q){ renderP(); return; }
+  const res=prods.filter(p=>p.name.toLowerCase().includes(q)||p.sub.toLowerCase().includes(q)||p.cat.includes(q));
+  document.getElementById('mgrid').innerHTML=res.length?res.map(mkCard).join(''):`<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)"><div style="font-size:48px;margin-bottom:14px">🔍</div><p>Produk "${document.getElementById('sinp').value}" tidak ditemukan</p></div>`;
+  document.getElementById('produk').scrollIntoView({behavior:'smooth'}); hov();
+}
+
+// ── CART ──
+let cart=[];
+function atc(p, qty=1, sz=null) {
+  const size = sz||p.sz[0];
+  const ex=cart.find(c=>c.id===p.id&&c.sz===size);
+  if(ex) ex.qty+=qty; else cart.push({...p,qty,sz:size});
+  updCart(); toast(`🛒 ${p.name} (${size}) ditambahkan ke keranjang!`);
+}
+function rmCart(i){ cart.splice(i,1); updCart(); }
+function chgCartQ(i,d){ cart[i].qty+=d; if(cart[i].qty<1) cart.splice(i,1); updCart(); }
+
+function updCart() {
+  const cnt=cart.reduce((s,c)=>s+c.qty,0);
+  document.getElementById('ccnt').textContent=cnt;
+  const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  document.getElementById('cSub').textContent=fmt(sub);
+  document.getElementById('cTot').textContent=fmt(sub);
+  const el=document.getElementById('citems');
+  if(!cart.length){ el.innerHTML=`<div class="cemp"><div style="font-size:56px;margin-bottom:14px">🛍️</div><p>Keranjangmu masih kosong.<br>Yuk mulai belanja!</p></div>`; return; }
+  el.innerHTML=cart.map((c,i)=>`
+  <div class="ceit">
+    <div class="ceimg">${c.em}</div>
+    <div class="ceinfo">
+      <div class="cename">${c.name}</div>
+      <div class="cesz">Ukuran: ${c.sz}</div>
+      <div class="ceprice">${fmt(c.price)}</div>
+      <div class="ceqty"><button class="qb" onclick="chgCartQ(${i},-1)">−</button><span class="qn">${c.qty}</span><button class="qb" onclick="chgCartQ(${i},1)">+</button></div>
+    </div>
+    <button class="cerm" onclick="rmCart(${i})">🗑</button>
+  </div>`).join('');
+  hov();
+}
+updCart();
+function togCart(){ document.getElementById('cov').classList.toggle('on'); document.getElementById('cdr').classList.toggle('on'); }
+
+// ── BUY NOW ──
+let bnP=null, bnQ=1, bnSz=null;
+function openBuy(p) {
+  bnP=p; bnQ=1; bnSz=p.sz[0];
+  document.getElementById('bnEm').textContent=p.em;
+  document.getElementById('bnNm').textContent=p.name;
+  document.getElementById('bnSb').textContent=p.sub;
+  document.getElementById('bnPr').textContent=fmt(p.price);
+  document.getElementById('bnQ').textContent=1;
+  document.getElementById('szOpts').innerHTML=p.sz.map((s,i)=>`<button class="szopt${i===0?' sel':''}" onclick="selSz('${s}',this)">${s}</button>`).join('');
+  openM('mBuy'); hov();
+}
+function selSz(s,btn){ bnSz=s; document.querySelectorAll('.szopt').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
+function chgQ(d){ bnQ=Math.max(1,bnQ+d); document.getElementById('bnQ').textContent=bnQ; }
+function confirmBuy() {
+  if(!user){ closeM('mBuy'); openM('mLogin'); toast('⚠️ Silakan login dulu untuk membeli!'); return; }
+  cart=[{...bnP, qty:bnQ, sz:bnSz||bnP.sz[0]}]; updCart(); closeM('mBuy'); openCheckout();
+}
+function atcFromBuy(){ atc(bnP, bnQ, bnSz); closeM('mBuy'); }
+
+// ── CHECKOUT ──
+let ship={idx:0,cost:0,name:'JNE REG'}, payM='Transfer BCA', disc=0;
+
+function openCheckout() {
+  if(!cart.length){ toast('⚠️ Keranjang masih kosong!'); return; }
+  if(!user){ toast('⚠️ Silakan login dulu!'); openM('mLogin'); return; }
+  if(!document.getElementById('snName').value && user) document.getElementById('snName').value=user.name;
+  goStep(1);
+  document.getElementById('cov').classList.remove('on');
+  document.getElementById('cdr').classList.remove('on');
+  openM('mCO');
+}
+
+function goStep(n) {
+  if(n===2) {
+    const nm=document.getElementById('snName').value.trim();
+    const ph=document.getElementById('snPhone').value.trim();
+    const ad=document.getElementById('snAddr').value.trim();
+    let ok=true;
+    [['snNameE',nm],['snPhoneE',ph],['snAddrE',ad]].forEach(([id,v])=>{ document.getElementById(id).classList.toggle('on',!v); if(!v) ok=false; });
+    if(!ok) return;
+  }
+  for(let i=1;i<=4;i++){
+    document.getElementById('cs'+i).classList.toggle('on',i===n);
+    const d=document.getElementById('sd'+i);
+    if(i<n){d.classList.add('done');d.classList.remove('act');}
+    else if(i===n){d.classList.add('act');d.classList.remove('done');}
+    else{d.classList.remove('done','act');}
+    if(i<4) document.getElementById('sl'+i).classList.toggle('done',i<n);
+  }
+  if(n===3) renderOrder();
+  hov();
+}
+
+function selShip(idx,cost,name){
+  ship={idx,cost,name};
+  for(let i=0;i<4;i++){const e=document.getElementById('sh'+i);if(e)e.classList.toggle('sel',i===idx);}
+}
+function selPay(idx,name){
+  payM=name;
+  for(let i=0;i<6;i++){const e=document.getElementById('po'+i);if(e)e.classList.toggle('sel',i===idx);}
+}
+function applyPromo(){
+  const code=document.getElementById('promoIn').value.trim().toUpperCase();
+  const msg=document.getElementById('promoMsg');
+  msg.style.display='block';
+  if(code==='NVNEW25'){disc=.25;msg.textContent='✅ Promo NVNEW25! Diskon 25%';msg.style.color='var(--olive)';}
+  else if(code==='NV10'){disc=.10;msg.textContent='✅ Promo NV10! Diskon 10%';msg.style.color='var(--olive)';}
+  else{disc=0;msg.textContent='❌ Kode promo tidak valid';msg.style.color='#e74c3c';}
+}
+function renderOrder(){
+  const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const d=Math.round(sub*disc);
+  const grand=sub-d+ship.cost;
+  document.getElementById('oList').innerHTML=
+    cart.map(c=>`<div class="oitem"><span>${c.em} ${c.name} (${c.sz}) ×${c.qty}</span><span>${fmt(c.price*c.qty)}</span></div>`).join('')+
+    (d?`<div class="oitem"><span>Diskon Promo</span><span style="color:var(--olive)">-${fmt(d)}</span></div>`:'')+
+    `<div class="oitem"><span>Ongkos Kirim (${ship.name})</span><span>${ship.cost?fmt(ship.cost):'Gratis'}</span></div>`;
+  document.getElementById('gTotal').textContent=fmt(grand);
+}
+function placeOrder(){
+  const num='NV'+Date.now().toString().slice(-8);
+  document.getElementById('ordNum').textContent='#'+num;
+  goStep(4);
+}
+
+// ── COUNTDOWN ──
+let end=new Date(); end.setHours(end.getHours()+5,end.getMinutes()+32,0,0);
+function tick(){
+  let d=Math.max(0,end-new Date());
+  const h=Math.floor(d/3600000); d-=h*3600000;
+  const m=Math.floor(d/60000); d-=m*60000;
+  const s=Math.floor(d/1000);
+  document.getElementById('cdh').textContent=String(h).padStart(2,'0');
+  document.getElementById('cdm').textContent=String(m).padStart(2,'0');
+  document.getElementById('cds').textContent=String(s).padStart(2,'0');
+}
+tick(); setInterval(tick,1000);
+
+// ── SCROLL ANIM ──
+function animC(){
+  const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}}),{threshold:.1});
+  document.querySelectorAll('.pcard,.tcard,.ccard').forEach(el=>{
+    el.style.opacity='0';el.style.transform='translateY(28px)';el.style.transition='opacity .55s ease,transform .55s ease';
+    obs.observe(el);
+  });
+}
+animC();
+</script>
+</body>
+</html>
